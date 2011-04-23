@@ -3,7 +3,7 @@
 Parse & PrettyPrint TeX's DVI files.
 
 = Usage
-> ruby parseDVI.rb > output.txt
+> ruby parseDVI.rb input.dvi > output.txt
 
 = Environment
   * This program works on CRuby 1.9 and JRuby 1.6(CRuby 1.9 compatible mode)
