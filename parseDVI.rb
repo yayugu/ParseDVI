@@ -1,4 +1,4 @@
-# coding: UTF-8
+# coding: utf-8
 require 'bigdecimal'
 require 'pp'
 
@@ -45,6 +45,18 @@ class Integer
   end
 end
 
+# hyperref等でxxx内にeucが使われたときの対策
+def parse_xxx_encoding(str)
+  case str
+  when /tounicode EUC\-UCS2/
+    'euc-jp'
+  when /tounicode .*RKSJ\-UCS2/
+    'windows-31j'
+  else
+    nil
+  end
+end
+
 # 連続したset, putをつなげる
 def join_op(s)
   new_s = []
@@ -73,6 +85,7 @@ end
 
 s = []
 b = open(ARGV[0], 'rb')
+xxx_encoding = nil
 
 unless b.respond_to?(:readbyte)
   def b.readbyte
@@ -145,7 +158,10 @@ while c = b.read(1)
   when 239..242
     s << {name: :xxx,
           k: k = readInt(b, c - 238),
-          x: b.read(k)}
+          x: (x = b.read(k);
+              xxx_encoding ||= parse_xxx_encoding(x)
+              xxx_encoding ? x.encode('utf-8', xxx_encoding) 
+                           : x.force_encoding('utf-8'))}
   when 243..246
     s << {name: :fnt_def,
           k: parseUInt(b.read(c - 242)),
