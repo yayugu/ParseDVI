@@ -209,7 +209,12 @@ s.each do |op|
     out << "    " * (stack.length - 1) << op[:name].to_s
     case op[:name]
     when :set, :put
-      out << " " << op[:str]
+      begin
+        out << " " << op[:str].force_encoding('utf-8')
+      rescue
+        out << out.encoding.inspect
+        out << op[:str].encoding.inspect
+      end
     when :bop
       stack[-1] = Register.new(0, 0, 0, 0, 0, 0)
       page += 1
